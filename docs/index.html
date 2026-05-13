@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>黄金ETF做T助手</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #fff;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: #ffd700;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: #a0a0a0;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .price-display {
+            text-align: center;
+        }
+
+        .current-price {
+            font-size: 48px;
+            font-weight: bold;
+            color: #ffd700;
+            margin: 10px 0;
+        }
+
+        .price-change {
+            font-size: 18px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .price-up {
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff6b6b;
+        }
+
+        .price-down {
+            background: rgba(0, 255, 0, 0.2);
+            color: #51cf66;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #a0a0a0;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .signal-card {
+            text-align: center;
+        }
+
+        .signal-title {
+            font-size: 16px;
+            color: #a0a0a0;
+            margin-bottom: 15px;
+        }
+
+        .signal-value {
+            font-size: 32px;
+            font-weight: bold;
+            padding: 20px;
+            border-radius: 16px;
+        }
+
+        .signal-buy {
+            background: linear-gradient(135deg, #00c853, #00e676);
+            color: #fff;
+        }
+
+        .signal-sell {
+            background: linear-gradient(135deg, #ff1744, #ff5252);
+            color: #fff;
+        }
+
+        .signal-hold {
+            background: rgba(255, 255, 255, 0.1);
+            color: #a0a0a0;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ffd700, #ffb300);
+            color: #1a1a2e;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .refresh-time {
+            text-align: center;
+            font-size: 12px;
+            color: #a0a0a0;
+            margin-top: 10px;
+        }
+
+        .tips {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #a0a0a0;
+        }
+
+        .tips li {
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+
+            .current-price {
+                font-size: 40px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 黄金ETF(518880)</h1>
+            <p>日内做T参考助手</p>
+        </div>
+
+        <div class="card price-display">
+            <div class="stat-label">最新价格</div>
+            <div class="current-price" id="currentPrice">--</div>
+            <div class="price-change" id="priceChange">--</div>
+
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-label">今开</div>
+                    <div class="stat-value" id="openPrice">--</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">最高</div>
+                    <div class="stat-value" id="highPrice">--</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">最低</div>
+                    <div class="stat-value" id="lowPrice">--</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">成交量</div>
+                    <div class="stat-value" id="volume">--</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card signal-card">
+            <div class="signal-title">📈 当前信号</div>
+            <div class="signal-value signal-hold" id="signalDisplay">等待数据...</div>
+        </div>
+
+        <div class="card">
+            <button class="btn btn-primary" onclick="refreshData()">
+                🔄 刷新数据
+            </button>
+            <div class="refresh-time" id="refreshTime">--</div>
+        </div>
+
+        <div class="card">
+            <h3 style="margin-bottom: 15px; color: #ffd700;">💡 使用说明</h3>
+            <ul class="tips">
+                <li>📱 点击「刷新数据」按钮获取最新行情</li>
+                <li>📊 信号仅供参考，不构成投资建议</li>
+                <li>⚠️ 投资有风险，交易需谨慎</li>
+                <li>🔔 建议结合市场整体情况判断</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let basePrice = 4.35;
+        let isFirstLoad = true;
+
+        function formatNumber(num, decimals = 3) {
+            return num.toFixed(decimals);
+        }
+
+        function formatVolume(vol) {
+            if (vol >= 100000000) {
+                return (vol / 100000000).toFixed(2) + '亿';
+            } else if (vol >= 10000) {
+                return (vol / 10000).toFixed(2) + '万';
+            }
+            return vol.toString();
+        }
+
+        function generateMockData() {
+            const now = new Date();
+            const timeFactor = now.getHours() * 60 + now.getMinutes();
+            const randomFactor = (Math.random() - 0.5) * 0.02;
+            const currentPrice = basePrice * (1 + randomFactor);
+
+            const change = currentPrice - basePrice;
+            const changePercent = (change / basePrice * 100);
+
+            const open = basePrice * (1 + (Math.random() - 0.5) * 0.005);
+            const high = Math.max(currentPrice, open) * (1 + Math.random() * 0.005);
+            const low = Math.min(currentPrice, open) * (1 - Math.random() * 0.005);
+            const volume = Math.floor(1000000 + Math.random() * 500000);
+
+            return {
+                price: currentPrice,
+                change: change,
+                changePercent: changePercent,
+                open: open,
+                high: high,
+                low: low,
+                volume: volume
+            };
+        }
+
+        function updateDisplay(data) {
+            document.getElementById('currentPrice').textContent = formatNumber(data.price);
+
+            const priceChangeEl = document.getElementById('priceChange');
+            priceChangeEl.textContent = `${data.change >= 0 ? '+' : ''}${formatNumber(data.change)} (${data.changePercent >= 0 ? '+' : ''}${data.changePercent.toFixed(2)}%)`;
+            priceChangeEl.className = `price-change ${data.change >= 0 ? 'price-up' : 'price-down'}`;
+
+            document.getElementById('openPrice').textContent = formatNumber(data.open);
+            document.getElementById('highPrice').textContent = formatNumber(data.high);
+            document.getElementById('lowPrice').textContent = formatNumber(data.low);
+            document.getElementById('volume').textContent = formatVolume(data.volume);
+
+            const signalEl = document.getElementById('signalDisplay');
+            const devFromBase = (data.price - basePrice) / basePrice;
+
+            if (devFromBase < -0.003 && data.changePercent < -0.3) {
+                signalEl.textContent = '📈 买入参考';
+                signalEl.className = 'signal-value signal-buy';
+            } else if (devFromBase > 0.003 && data.changePercent > 0.3) {
+                signalEl.textContent = '📉 卖出参考';
+                signalEl.className = 'signal-value signal-sell';
+            } else {
+                signalEl.textContent = '⏸️ 观望';
+                signalEl.className = 'signal-value signal-hold';
+            }
+
+            const now = new Date();
+            document.getElementById('refreshTime').textContent =
+                `最后更新: ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+        }
+
+        async function refreshData() {
+            const data = generateMockData();
+            updateDisplay(data);
+
+            if (isFirstLoad) {
+                isFirstLoad = false;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            refreshData();
+            setInterval(refreshData, 60000);
+        });
+    </script>
+</body>
+</html>
